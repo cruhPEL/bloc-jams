@@ -78,13 +78,21 @@ var setCurrentAlbum = function(album) {
 // bloc implementation
 // After dissecting the Bloc implementation (see commented out portion below), I can see some of the differences
 // between my implementation and the Bloc
+
 var findParentByClassName = function(element, targetClass) {
     if (element) {
-        var currentParent = element.parentElement;
-        while (currentParent.className != targetClass && currentParent.className !== null) {
-            currentParent = currentParent.parentElement;
+        var currentParent = element.parentElement;    
+        if (currentParent) {        
+            if (currentParent.className === targetClass) {
+                while (currentParent.className != targetClass && currentParent.className !== null) {
+                    currentParent = currentParent.parentElement;
+                }
+                return currentParent;
+            } else 
+                alert('No parent found with that class name');
+        } else {
+            alert('No Parent Found');
         }
-        return currentParent;
     }
 };
 
