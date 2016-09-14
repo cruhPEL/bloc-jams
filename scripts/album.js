@@ -60,90 +60,41 @@ var createSongRow = function(songNumber, songName, songLength) {
     return $row;
 };
 
-var nextSong = function() {
-    // Req 1: Know what the previous song is. This includes the situation in which the next song is the first song, following the final song in the album (that is, it should "wrap" around).
-    // my implementation
+var skipSong = function(skipDirection) {
     
-//    if (currentlyPlayingSong !== 0) {
-//        previouslyPlayingSong = currentAlbum.songs[currentSongIndex-1];
-//    } else { 
-//        previouslyPlayingSong = currentAlbum.songs[4]; 
-//    }
+    var skipDirection = skipDirection;
     
-    // Bloc Req 1
-    // Their implementation is better than mine (especially since mine doesn't work), but it's similar. The basic logic is the same. I.e. Is the currents song number equal to 0, no? then the previous song is whatever the current index is minus 1. If it is zero, then the previous song is the last song. This implementation is slightly different, but follows the same course.
     var getLastSongNumber = function(index) {
         return index == 0 ? currentAlbum.songs.length : index;
     };
-    
-    // Req 2: Use the trackIndex() helper function to get the index of the current song and then increment the value of the index.
-    // we had the same implementation for getting the index, but I differed slightly in how to increment. I also had not yet written the exception for if the current song went past the album length.
+        
     var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);
+    
     currentSongIndex++;
     
     if (currentSongIndex >= currentAlbum.songs.length) {
         currentSongIndex = 0;
     }
     
-    // Req 3: Set a new current song to currentSongFromAlbum.
+    if (skipDirection === 'previous') {
+        
+        getLastSongNumber = function(index) {
+            return index == (currentAlbum.songs.length - 1) ? 1 : index + 2;
+        };
     
-    // I incremented my index within the function below, setting the new current song at the same time.
-    
-//    var newCurrentSong = function() {    
-//        currentSongFromAlbum = currentAlbum.songs[currentSongIndex+1];  
-//        updatePlayerSongBar();
-//        
-//    }
-    
-    // Bloc Req 3
-    
-    setSong(currentSongIndex + 1);
-    
-    
-    // Req 4: Update the player bar to show the new song.
-    
-    // I did this in the function above, using the updatePlayerSongBar() function.
-    
-    updatePlayerSongBar();
+        var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);
 
-    
-    // Req 5 & 6: Update the HTML of the previous song's .song-item-number element with a number ... Update the HTML of the new song's .song-item-number element with a pause button.
-    
-    // I got stuck here and could not figure out how to get back into the html, but I can see what is being done. The previous song's number is stored in a variable that calls the first function we created. Then, to get the html for each element, the class selector is used, and the data attribute is accessed and has the appropriate song number passed into it.
-    var lastSongNumber = getLastSongNumber(currentSongIndex);
-    var $nextSongNumberCell = getSongNumberCell(currentlyPlayingSongNumber);
-    var $lastSongNumberCell = getSongNumberCell(lastSongNumber);
-    
-    $nextSongNumberCell.html(pauseButtonTemplate);
-    $lastSongNumberCell.html(lastSongNumber);    
-    
-};
-
-var previousSong = function() {
-    //
-    var getLastSongNumber = function(index) {
-        return index == (currentAlbum.songs.length - 1) ? 1 : index + 2;
-    };
-    
-    // 
-    var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);          
-    
-    currentSongIndex--;
-    
-    if (currentSongIndex < 0) {
-        currentSongIndex = currentAlbum.songs.length -1;
+        currentSongIndex--;
+        
+        if (currentSongIndex < 0) {
+            currentSongIndex = currentAlbum.songs.length -1;
+        }
     }
     
-        
-    // 
     setSong(currentSongIndex + 1);
     
-    
-    // 
     updatePlayerSongBar();
 
-    
-    // 
     var lastSongNumber = getLastSongNumber(currentSongIndex);
     var $nextSongNumberCell = getSongNumberCell(currentlyPlayingSongNumber);
     var $lastSongNumberCell = getSongNumberCell(lastSongNumber);
@@ -152,6 +103,33 @@ var previousSong = function() {
     $lastSongNumberCell.html(lastSongNumber);    
     
 };
+
+//var previousSong = function() {
+//
+//    var getLastSongNumber = function(index) {
+//        return index == (currentAlbum.songs.length - 1) ? 1 : index + 2;
+//    };
+//    
+//    var currentSongIndex = trackIndex(currentAlbum, currentSongFromAlbum);          
+//    
+//    currentSongIndex--;
+//    
+//    if (currentSongIndex < 0) {
+//        currentSongIndex = currentAlbum.songs.length -1;
+//    }
+//    
+//    setSong(currentSongIndex + 1);
+//    
+//    updatePlayerSongBar();
+// 
+//    var lastSongNumber = getLastSongNumber(currentSongIndex);
+//    var $nextSongNumberCell = getSongNumberCell(currentlyPlayingSongNumber);
+//    var $lastSongNumberCell = getSongNumberCell(lastSongNumber);
+//    
+//    $nextSongNumberCell.html(pauseButtonTemplate);
+//    $lastSongNumberCell.html(lastSongNumber);    
+//    
+//};
 
 
 var setCurrentAlbum = function(album) {
@@ -215,8 +193,14 @@ var $nextButton = $('.main-controls .next');
 $(document).ready(function() {
     
     setCurrentAlbum(albumPicasso);
-    $previousButton.click(previousSong);
-    $nextButton.click(nextSong);
+    
+    $previousButton.click(function(){
+        skipSong('previous');
+    });
+    
+    $nextButton.click(function(){
+        skipSong('next');
+    });
         
 });
 
